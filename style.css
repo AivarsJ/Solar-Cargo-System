@@ -1,13 +1,30 @@
 body {
-  background-color: lightblue;
+  background-color: lightgrey;
 }
 
 h1 {
-  color: white;
+  color: black;
+  font-family: verdana;
+  font-size: 24px
   text-align: center;
+}
+
+h2 {
+  color: black;
+  font-family: verdana;
+  font-size: 20px
+  text-align: center;
+}
+
+ul {
+  color: black;
+  font-family: verdana;
+  font-size: 20px
+  text-align: center;
+  padding: 10px
 }
 
 p {
   font-family: verdana;
-  font-size: 20px;
+  font-size: 18px;
 }

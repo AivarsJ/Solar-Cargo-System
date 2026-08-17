@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="lv">
+<head>
+    <meta charset="UTF-8">
+    <title>Pievienot jaunu konteineri</title>
+	<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <h1>Pievienot jaunu konteineri</h1>
+
+<form action="/action_page.php">
+  <label for="lID">ID:</label><br>
+  <input type="text" id="lID" name="lID" value="ZZ-9987"><br>
+  
+  <label for="lmineral">Minerāls:</label><br>
+  <input type="text" id="lmineral" name="lmineral" value="Broms"><br>
+  
+  <label for="lorigin_base">Izcelšanās bāze:</label><br>
+  <input type="text" id="lorigin_base" name="lorigin_base" value="Mēness 2"><br>
+  
+  <label for="ldestination">Galamērķa bāze:</label><br>
+  <input type="text" id="ldestination" name="ldestination" value="Zeme_Latvija_1"><br>
+  
+  <label for="lstatus">Statuss:</label><br>
+  <select id="lstatus" name="lstatus">
+    <option value="none">---</option>
+	<option value="on_way">Ceļā</option>
+    <option value="at_wearhouse">Noliktavā</option>
+    <option value="delivered">Piegādāts</option>
+  </select>
+  
+  <input type="submit" value="Saglabāt">
+  
+</form>
+
+</body>
+</html>

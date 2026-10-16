@@ -1,129 +1,49 @@
- <?php
-// Izveidojam savienojumu ar MySQL datubāzi, izmantojot PDO.
-try {
-    $pdo = new PDO(
-        "mysql:host=localhost;dbname=solar_cargo;charset=utf8mb4",
-        "root",
-        ""
-    );
-
-    // Kļūdu gadījumā PDO izmet izņēmumu, ko var apstrādāt.
-    $pdo->setAttribute(
-        PDO::ATTR_ERRMODE,
-        PDO::ERRMODE_EXCEPTION
-    );
-
-} catch (PDOException $e) {
-    exit("Neizdevās savienoties ar datubāzi.");
-}
-
-// Mainīgais reģistrācijas kļūdas paziņojumam.
-$kluda = "";
-
-// Reģistrāciju apstrādājam tikai pēc formas nosūtīšanas ar POST.
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
-
-    // Saņemam ievadītos datus un noņemam liekās atstarpes lietotājvārdam.
-    $lietotajvards = trim($_POST["fusername"] ?? "");
-    $parole = $_POST["fpassword_hash"] ?? "";
-    // Jaunam lietotājam paredzēta parastā lietotāja loma.
-    // Šajā INSERT vaicājumā loma netiek saglabāta; to nosaka datubāzes noklusējums.
-    $loma = "user";
-
-    // Pārbaudām, vai abi obligātie lauki ir aizpildīti.
-    if ($lietotajvards === "" || $parole === "") {
-        $kluda = "Lūdzu, aizpildiet visus laukus!";
-    } elseif (!in_array($loma, ["admin", "user"], true)) {
-        $kluda = "Nederīga lietotāja loma!";
+<?php
+require_once __DIR__ . '/auth.php';
+noCache();
+$kluda = $_SESSION['register_error'] ?? '';
+$veiksme = $_SESSION['register_success'] ?? '';
+unset($_SESSION['register_error'], $_SESSION['register_success']);
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!csrfValid()) {
+        $_SESSION['register_error'] = 'Forma ir novecojusi. Mēģiniet vēlreiz.';
+        redirect('db.php');
+    }
+    $username = trim((string)($_POST['fusername'] ?? ''));
+    $password = (string)($_POST['fpassword_hash'] ?? '');
+    if ($username === '' || $password === '') {
+        $_SESSION['register_error'] = 'Aizpildiet abus laukus.';
+    } elseif (mb_strlen($username, 'UTF-8') > 100) {
+        $_SESSION['register_error'] = 'Lietotājvārds ir pārāk garš.';
     } else {
         try {
-            // Paroli glabājam kā drošu jaucējvērtību, nevis atklātu tekstu.
-            $parole_hash = password_hash(
-                $parole,
-                PASSWORD_DEFAULT
-            );
-
-            // Sagatavojam SQL vaicājumu jaunā konta saglabāšanai.
-            $sql = "INSERT INTO lietotaji
-                    (lietotajvards, parole_hash)
-                    VALUES
-                    (:lietotajvards, :parole_hash)";
-
-            // Parametrizēts vaicājums palīdz novērst SQL injekcijas.
-            $stmt = $pdo->prepare($sql);
-
-            $stmt->execute([
-                ":lietotajvards" => $lietotajvards,
-                ":parole_hash" => $parole_hash
-            ]);
-
-            // Pēc veiksmīgas reģistrācijas atgriežamies ar veiksmes atzīmi.
-            header("Location: db.php?saglabats=1");
-            exit;
-
-        } catch (PDOException $e) {
-            // Tehnisko kļūdu reģistrējam servera žurnālā, nevis rādām lietotājam.
-            error_log($e->getMessage());
-            $kluda = "Datus neizdevās saglabāt.";
+            $pdo = new PDO('mysql:host=localhost;dbname=solar_cargo;charset=utf8mb4', 'root', '',
+                [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
+            // Lomu nekad nesaņemam no formas. Reģistrācijai vienmēr piešķiram user.
+            $stmt = $pdo->prepare('INSERT INTO lietotaji (lietotajvards, parole_hash, loma) VALUES (:v, :p, :l)');
+            $stmt->execute([':v'=>$username, ':p'=>password_hash($password, PASSWORD_DEFAULT), ':l'=>'user']);
+            $_SESSION['register_success'] = 'Reģistrācija veiksmīga. Tagad varat pieslēgties.';
+        } catch (PDOException $ex) {
+            error_log($ex->getMessage());
+            $_SESSION['register_error'] = 'Reģistrācija neizdevās. Pārbaudiet datus vai mēģiniet citu lietotājvārdu.';
         }
     }
+    redirect('db.php');
 }
 ?>
- 
- <!DOCTYPE html>
-<html lang="lv">
-<head>
-    <meta charset="UTF-8">
-    <title>Solar Cargo System</title>
-	<link rel="stylesheet" href="style.css">
-</head>
-<body>
-    <h1>Solar Cargo System</h1>
-    <p>Kosmisko konteineru uzskaites sistēma.</p>
-
-    <h2>Lietotāju reģistrācijas forma</h2>
-    
-<?php if (isset($_GET["saglabats"])
-          && $_GET["saglabats"] === "1"): ?>
-    <p class="success">
-        Paldies! Jūsu reģistrācija ir veiksmīga.
-    </p>
-<?php endif; ?>
-
-<!-- Kļūdas tekstu droši izvadām HTML, izmantojot htmlspecialchars. -->
-<?php if ($kluda !== ""): ?>
-    <p class="error">
-        <?= htmlspecialchars($kluda, ENT_QUOTES, "UTF-8") ?>
-    </p>
-<?php endif; ?>
-
-<!-- Forma nosūta lietotājvārdu un paroli uz db.php ar POST metodi. -->
-<form action="db.php" method="post">
-
-    <!-- Obligāts lietotājvārda ievades lauks. -->
-    <label for="fusername">Lietotajvards:</label>
-    <input
-        type="text"
-        id="fusername"
-        name="fusername"
-        maxlength="100"
-        required
-    >
-
-    <!-- Paroles lauks paslēpj ievadītās rakstzīmes pārlūkā. -->
-    <label for="fpassword_hash">Parole:</label>
-    <input
-        type="password"
-        id="fpassword_hash"
-        name="fpassword_hash"
-        maxlength="255"
-        required
-    >
-
-	    
-	<button type="submit">Saglabāt</button>
-
-</form>
-	
-</body>
-</html>
+<!DOCTYPE html><html lang="lv"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reģistrācija — Solar Cargo System</title><link rel="stylesheet" href="style.css"></head><body>
+<main class="site-container"><h1>Solar Cargo System</h1><h2>Lietotāju reģistrācija</h2>
+<?php if ($kluda !== ''): ?><p class="error" role="alert"><?= e($kluda) ?></p><?php endif; ?>
+<?php if ($veiksme !== ''): ?><p class="success" role="status"><?= e($veiksme) ?></p><?php endif; ?>
+<form action="db.php" method="post" autocomplete="off">
+<input type="hidden" name="csrf_token" value="<?= e(csrfToken()) ?>">
+<label for="fusername">Lietotājvārds:</label><input type="text" id="fusername" name="fusername" maxlength="100" autocomplete="off" required value="">
+<label for="fpassword_hash">Parole:</label><input type="password" id="fpassword_hash" name="fpassword_hash" autocomplete="new-password" required value="">
+<button type="submit">Reģistrēties</button><p><a href="login.php">Pieslēgties</a></p><p><a href="index.php">Galvenā lapa</a></p>
+</form></main><script>
+window.addEventListener('pageshow', function (event) {
+    if (event.persisted) { window.location.reload(); return; }
+    document.querySelectorAll('input[type="text"],input[type="password"]').forEach(el => el.value = '');
+});
+</script></body></html>

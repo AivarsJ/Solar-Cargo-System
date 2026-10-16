@@ -1,29 +1,25 @@
 <?php
-// Sākam sesiju, lai piekļūtu pašreizējā lietotāja pieslēgšanās datiem.
-session_start();
-
-// Iztukšojam visus sesijas mainīgos (piemēram, lietotāja ID un lomu).
-$_SESSION = [];
-
-// Ja sesijas identifikators tiek glabāts pārlūkprogrammas sīkdatnē,
-// dzēšam to, nosūtot sīkdatni ar pagātnes derīguma termiņu.
-if (ini_get('session.use_cookies')) {
-    // Iegūstam esošās sesijas sīkdatnes iestatījumus,
-    // lai dzēšanai izmantotu to pašu ceļu, domēnu un drošības parametrus.
-    $params = session_get_cookie_params();
-    setcookie(session_name(), '', [
-        'expires' => time() - 42000, // Derīguma termiņš pagātnē.
-        'path' => $params['path'], // Sīkdatnes ceļš.
-        'domain' => $params['domain'], // Sīkdatnes domēns.
-        'secure' => $params['secure'], // Vai sīkdatne paredzēta tikai HTTPS.
-        'httponly' => $params['httponly'], // Ierobežo piekļuvi no JavaScript.
-        'samesite' => $params['samesite'] ?? 'Lax' // Starpvietņu pieprasījumu politika.
-    ]);
+require_once __DIR__ . '/auth.php';
+noCache();
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!csrfValid()) { http_response_code(403); exit('Nederīgs izrakstīšanās pieprasījums.'); }
+    $_SESSION = [];
+    if (ini_get('session.use_cookies')) {
+        $params = session_get_cookie_params();
+        setcookie(session_name(), '', [
+            'expires'=>time()-3600, 'path'=>$params['path'], 'domain'=>$params['domain'],
+            'secure'=>$params['secure'], 'httponly'=>$params['httponly'],
+            'samesite'=>$params['samesite'] ?? 'Lax'
+        ]);
+    }
+    session_destroy();
+    redirect('index.php');
 }
-
-// Iznīcinām sesiju servera pusē, pabeidzot lietotāja izrakstīšanos.
-session_destroy();
-
-// Pēc izrakstīšanās pāradresējam uz publisko sākumlapu.
-header('Location: index.php');
-exit; // Apturam skripta izpildi pēc pāradresācijas.
+?>
+<!DOCTYPE html><html lang="lv"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Izrakstīšanās — Solar Cargo System</title><link rel="stylesheet" href="style.css"></head><body>
+<main class="site-container"><h1>Solar Cargo System</h1><h2>Izrakstīšanās</h2>
+<p>Vai vēlaties izrakstīties no sistēmas?</p>
+<form action="logout.php" method="post"><input type="hidden" name="csrf_token" value="<?= e(csrfToken()) ?>">
+<button type="submit">Apstiprināt izrakstīšanos</button><p><a href="index.php">Atpakaļ uz sākumlapu</a></p></form>
+</main></body></html>

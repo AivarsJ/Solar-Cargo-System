@@ -180,3 +180,11 @@ form input[type="submit"] {
 
 /* Atsevišķo lietotāja un administratora lapu papildinājumi */
 .admin-panel + .navigation { margin-top: 22px; }
+
+/* Drošās izrakstīšanās pogas un ziņojumi */
+.logout-inline { display: inline; width: auto; max-width: none; margin: 0; padding: 0; border: 0; background: transparent; }
+.logout-inline button { padding: 10px 14px; background: #2c3e50; color: white; border: 0; border-radius: 5px; cursor: pointer; font: 14px Verdana, sans-serif; }
+.logout-inline button:hover { background: #1a252f; }
+.error { color: #9b1c1c; text-align: center; }
+.success { color: #176534; text-align: center; }
+form input[type="password"] { width: 100%; padding: 10px; box-sizing: border-box; font-size: 16px; }

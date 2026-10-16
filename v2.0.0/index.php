@@ -16,6 +16,7 @@
         <li>Dispečers</li>
         <li>Noliktavas operators</li>
         <li>Vadītājs</li>
+		<li>Sistēmas administrators</li>
     </ul>
 
     <h2>Navigācija</h2>

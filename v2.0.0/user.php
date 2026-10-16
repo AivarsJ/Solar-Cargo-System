@@ -1,26 +1,9 @@
 <?php
-// Šī lapa ir pieejama tikai lietotājiem, kuri ir pieslēgušies un kuriem ir loma "user".
-
-// Sākam vai turpinām PHP sesiju, lai varētu nolasīt pieslēgšanās datus.
-session_start();
-
-// Ja sesijā nav lietotāja ID, lietotājs nav autentificēts.
-// Novirzām viņu uz pieslēgšanās lapu un pārtraucam koda izpildi.
-if (!isset($_SESSION['lietotaja_id'])) {
-    header('Location: login.php');
-    exit;
-}
-
-// Pārbaudām lietotāja lomu. Administrators un citas lomas šo lapu nevar atvērt.
-// ?? '' nozīmē: ja sesijā lomas nav, izmantojam tukšu tekstu.
-if (($_SESSION['loma'] ?? '') !== 'user') {
-    header('Location: index.php');
-    exit;
-}
-
-// Iegūstam lietotājvārdu no sesijas un droši sagatavojam to attēlošanai HTML.
-// htmlspecialchars() neļauj lietotājvārdā ievadītam HTML tikt interpretētam kā kodam.
-$lietotajvards = htmlspecialchars((string) ($_SESSION['lietotajvards'] ?? ''), ENT_QUOTES, 'UTF-8');
+require_once __DIR__ . '/auth.php';
+noCache();
+if (!isset($_SESSION['lietotaja_id'])) redirect('login.php');
+if (($_SESSION['loma'] ?? '') !== 'user') { http_response_code(403); exit('Piekļuve liegta.'); }
+$lietotajvards = e((string)($_SESSION['lietotajvards'] ?? ''));
 ?>
 <!DOCTYPE html>
 <html lang="lv">
@@ -47,8 +30,8 @@ $lietotajvards = htmlspecialchars((string) ($_SESSION['lietotajvards'] ?? ''), E
         <a href="add-container.html">Pievienot jaunu konteineru</a>
         <a href="index.php">Galvenā lapa</a>
         <!-- logout.php izbeidz sesiju un atgriež lietotāju sākumlapā. -->
-        <a href="logout.php">Izrakstīties</a>
+        <form class="logout-inline" action="logout.php" method="post"><input type="hidden" name="csrf_token" value="<?= e(csrfToken()) ?>"><button type="submit">Izrakstīties</button></form>
     </nav>
 </main>
-</body>
+<script>window.addEventListener('pageshow', function(event) { if (event.persisted) window.location.reload(); });</script></body>
 </html>

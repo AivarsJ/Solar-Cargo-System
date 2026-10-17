@@ -1,12 +1,26 @@
 <?php
+/**
+ * Lietotāja pieslēgšanās lapas kontrolieris.
+ *
+ * Pārbauda aktīvo sesiju, apstrādā pieslēgšanās formu, pārbauda CSRF tokenu,
+ * autentificē lietotāju datubāzē un novirza uz lomai atbilstošo lapu.
+ * Kļūdu paziņojumi tiek glabāti sesijā līdz nākamajam pieprasījumam.
+ */
 require_once __DIR__ . '/auth.php';
 noCache();
-// Pēc iepriekšējas autentifikācijas nepieprasām paroli atkārtoti.
+/**
+ * Novirza jau autentificētu lietotāju uz administratora vai lietotāja lapu.
+ */
 if (isset($_SESSION['lietotaja_id'])) {
     redirect(($_SESSION['loma'] ?? '') === 'admin' ? 'admin.php' : 'user.php');
 }
+/** @var string $kluda Iepriekšējā pieslēgšanās mēģinājuma kļūdas paziņojums. */
 $kluda = $_SESSION['login_error'] ?? '';
 unset($_SESSION['login_error']);
+/**
+ * Apstrādā POST pieprasījumu: validē CSRF un ievades datus,
+ * pārbauda paroles atbilstību un izveido autentificētu sesiju.
+ */
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!csrfValid()) {
         $_SESSION['login_error'] = 'Forma ir novecojusi. Lūdzu, mēģiniet vēlreiz.';
@@ -17,6 +31,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($username === '' || $password === '') {
         $_SESSION['login_error'] = 'Aizpildiet abus laukus.';
     } else {
+        /**
+         * Iegūst lietotāja ierakstu ar sagatavotu SQL vaicājumu un pārbauda paroli.
+         * Veiksmīgas autentifikācijas gadījumā atjauno sesijas identifikatoru
+         * un CSRF tokenu, pēc tam novirza lietotāju pēc lomas.
+         */
         try {
             $pdo = new PDO('mysql:host=localhost;dbname=solar_cargo;charset=utf8mb4', 'root', '',
                 [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
@@ -52,7 +71,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <button type="submit">Pieslēgties</button><p>Nav konta? <a href="db.php">Reģistrēties</a></p>
 <p><a href="index.php">Galvenā lapa</a></p></form></main>
 <script>
-// Back/Forward Cache atjaunojot lapu, pārlādējam to, lai iegūtu tukšu formu.
+/**
+ * Notīra pieslēgšanās formas laukus, kad lapa tiek parādīta.
+ * Ja lapa atjaunota no Back/Forward Cache, pārlādē to.
+ *
+ * @param {PageTransitionEvent} event Lapas parādīšanas notikums.
+ * @returns {void}
+ */
 window.addEventListener('pageshow', function (event) {
     if (event.persisted) { window.location.reload(); return; }
     const form = document.querySelector('form');

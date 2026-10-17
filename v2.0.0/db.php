@@ -1,14 +1,25 @@
 <?php
+/**
+ * Lietotāju reģistrācijas lapas apstrāde.
+ *
+ * Apstrādā POST pieprasījumus, pārbauda CSRF tokenu un ievades datus,
+ * saglabā jaunu lietotāju datubāzē un attēlo reģistrācijas formu.
+ * Paziņojumi par rezultātu tiek nodoti ar sesijas mainīgajiem.
+ */
+/** Ielādē kopīgās sesijas, drošības un pāradresācijas funkcijas. */
 require_once __DIR__ . '/auth.php';
 noCache();
+/** Nolasa un pēc tam notīra iepriekšējā pieprasījuma paziņojumus. */
 $kluda = $_SESSION['register_error'] ?? '';
 $veiksme = $_SESSION['register_success'] ?? '';
 unset($_SESSION['register_error'], $_SESSION['register_success']);
+/** Apstrādā reģistrācijas formas iesniegšanu. */
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!csrfValid()) {
         $_SESSION['register_error'] = 'Forma ir novecojusi. Mēģiniet vēlreiz.';
         redirect('db.php');
     }
+    /** Nolasa lietotājvārdu un paroli no formas. */
     $username = trim((string)($_POST['fusername'] ?? ''));
     $password = (string)($_POST['fpassword_hash'] ?? '');
     if ($username === '' || $password === '') {
@@ -16,6 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif (mb_strlen($username, 'UTF-8') > 100) {
         $_SESSION['register_error'] = 'Lietotājvārds ir pārāk garš.';
     } else {
+        /** Izveido lietotāju ar noklusēto 'user' lomu un droši jauktu paroli. */
         try {
             $pdo = new PDO('mysql:host=localhost;dbname=solar_cargo;charset=utf8mb4', 'root', '',
                 [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
@@ -42,6 +54,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <label for="fpassword_hash">Parole:</label><input type="password" id="fpassword_hash" name="fpassword_hash" autocomplete="new-password" required value="">
 <button type="submit">Reģistrēties</button><p><a href="login.php">Pieslēgties</a></p><p><a href="index.php">Galvenā lapa</a></p>
 </form></main><script>
+/**
+ * Notīra reģistrācijas formas teksta un paroles laukus pēc lapas parādīšanas.
+ * Ja lapa atjaunota no pārlūka atpakaļ/uz priekšu kešatmiņas, pārlādē to.
+ *
+ * @param {PageTransitionEvent} event Lapas parādīšanas notikums.
+ * @returns {void}
+ */
 window.addEventListener('pageshow', function (event) {
     if (event.persisted) { window.location.reload(); return; }
     document.querySelectorAll('input[type="text"],input[type="password"]').forEach(el => el.value = '');

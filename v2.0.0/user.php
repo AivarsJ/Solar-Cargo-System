@@ -1,8 +1,41 @@
 <?php
+/**
+ * Lietotāja darba lapas piekļuves kontrole un datu sagatavošana.
+ *
+ * Lapa ir pieejama tikai autentificētiem lietotājiem ar lomu "user".
+ * Sesijas pārvaldības un drošības palīgfunkcijas tiek ielādētas no auth.php.
+ */
 require_once __DIR__ . '/auth.php';
+
+/**
+ * Aizliedz pārlūkam saglabāt lapas saturu kešatmiņā,
+ * lai pēc izrakstīšanās netiktu rādīta iepriekšējā sesija.
+ *
+ * @see noCache()
+ */
 noCache();
+
+/**
+ * Pārbauda, vai sesijā ir autentificēta lietotāja identifikators.
+ * Ja tā nav, pāradresē uz pieslēgšanās lapu.
+ *
+ * @see redirect()
+ */
 if (!isset($_SESSION['lietotaja_id'])) redirect('login.php');
+
+/**
+ * Ierobežo piekļuvi lietotājiem ar lomu "user".
+ * Neatbilstošas lomas gadījumā atgriež HTTP 403 un pārtrauc izpildi.
+ */
 if (($_SESSION['loma'] ?? '') !== 'user') { http_response_code(403); exit('Piekļuve liegta.'); }
+
+/**
+ * Sagatavo sesijā glabāto lietotājvārdu drošai attēlošanai HTML.
+ * Ja lietotājvārds nav pieejams, izmanto tukšu virkni.
+ *
+ * @var string $lietotajvards HTML kontekstam ekranēts lietotājvārds.
+ * @see e()
+ */
 $lietotajvards = e((string)($_SESSION['lietotajvards'] ?? ''));
 ?>
 <!DOCTYPE html>

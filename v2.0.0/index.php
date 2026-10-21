@@ -21,8 +21,8 @@
 
     <h2>Navigācija</h2>
     <nav class="navigation" aria-label="Galvenā navigācija">
-        <a href="containers.html">Apskatīt konteineru sarakstu</a>
-        <a href="add-container.html">Pievienot jaunu konteineru</a>
+        <a href="containers_list.php">Apskatīt konteineru sarakstu</a>
+        <a href="add-container.php">Pievienot jaunu konteineru</a>
         <a href="db.php">Reģistrēties</a>
         <a href="login.php">Pieslēgties</a>
         <a href="logout.php">Izrakstīties</a>

@@ -33,8 +33,8 @@ $lietotajvards = e((string)($_SESSION['lietotajvards'] ?? ''));
                 <!-- Saites uz konteineru saraksta un pievienošanas lapām. -->
                 <h3>Konteineru pārvaldība</h3>
                 <p>Konteineru saraksts un pievienošana.</p>
-                <a href="containers.html">Konteineru saraksts</a>
-                <a href="add-container.html">Pievienot konteineru</a>
+                <a href="containers_list.php">Konteineru saraksts</a>
+                <a href="add-container.php">Pievienot konteineru</a>
             </div>
             <div class="admin-card">
                 <!-- Iestatījumu sadaļa pašlaik ir sagatave. -->

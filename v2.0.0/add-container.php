@@ -14,77 +14,82 @@ if (!in_array($_SESSION['loma'] ?? '', ['user', 'admin'], true)) {
     exit('Piekļuve liegta.');
 }
 
-// Savienojums ar datubāzi
-try {
-    $pdo = getDatabaseConnection();
-
-    $pdo->setAttribute(
-        PDO::ATTR_ERRMODE,
-        PDO::ERRMODE_EXCEPTION
-    );
-} catch (PDOException $e) {
-    error_log($e->getMessage());
-    exit("Neizdevās savienoties ar datubāzi.");
+/** Nolasa un apgriež konteineru formas laukus. */
+function getContainerData(array $post): array
+{
+    return [
+        'cargo_code' => trim($post['fcargo_code'] ?? ''),
+        'mineral' => trim($post['fmineral'] ?? ''),
+        'mass_kg' => trim($post['fmass_kg'] ?? ''),
+        'origin' => trim($post['forigin'] ?? ''),
+        'destination' => trim($post['fdestination'] ?? ''),
+        'status' => trim($post['fstatus'] ?? ''),
+    ];
 }
 
-// Saņemam un saglabājam formas datus
-$kluda = "";
+/** Atgriež kļūdas tekstu vai tukšu virkni, ja dati ir derīgi. */
+function validateContainer(array $data): string
+{
+    foreach ($data as $value) {
+        if ($value === '') {
+            return 'Lūdzu, aizpildiet visus laukus!';
+        }
+    }
 
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    if (!is_numeric($data['mass_kg']) || (float)$data['mass_kg'] <= 0) {
+        return 'Konteinera masai jābūt pozitīvam skaitlim!';
+    }
 
-    // Pārbaudām formas drošības tokenu
+    if (!in_array($data['status'], ['on_way', 'at_warehouse', 'delivered', 'delayed'], true)) {
+        return 'Izvēlēts nederīgs konteinera statuss!';
+    }
+
+    return '';
+}
+
+/** Saglabā pārbaudītus konteinera datus datubāzē. */
+function saveContainer(PDO $pdo, array $data): void
+{
+    $sql = 'INSERT INTO containers
+            (cargo_code, mineral, mass_kg, origin, destination, status)
+            VALUES (:cargo_code, :mineral, :mass_kg, :origin, :destination, :status)';
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([
+        ':cargo_code' => $data['cargo_code'],
+        ':mineral' => $data['mineral'],
+        ':mass_kg' => $data['mass_kg'],
+        ':origin' => $data['origin'],
+        ':destination' => $data['destination'],
+        ':status' => $data['status'],
+    ]);
+}
+
+// Datubāzes savienojums, izmantojot kopīgo funkciju.
+try {
+    $pdo = getDatabaseConnection();
+} catch (PDOException $e) {
+    error_log($e->getMessage());
+    exit('Neizdevās savienoties ar datubāzi.');
+}
+
+$kluda = '';
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!csrfValid()) {
         http_response_code(403);
         exit('Nederīgs formas drošības tokens.');
     }
-	
-    $cargo_code = trim($_POST["fcargo_code"] ?? "");
-    $mineral = trim($_POST["fmineral"] ?? "");
-	$mass_kg = trim($_POST["fmass_kg"] ?? "");
-	$origin = trim($_POST["forigin"] ?? "");
-	$destination = trim($_POST["fdestination"] ?? "");
-	$status = trim($_POST["fstatus"] ?? "");
-	
 
-    if (
-    $cargo_code === "" ||
-    $mineral === "" ||
-    $mass_kg === "" ||
-    $origin === "" ||
-    $destination === "" ||
-    $status === ""
-	) {
-    $kluda = "Lūdzu, aizpildiet visus laukus!";
-	} elseif (!is_numeric($mass_kg) || (float)$mass_kg <= 0) {
-    $kluda = "Konteinera masai jābūt pozitīvam skaitlim!";
-	} elseif (!in_array($status, ['on_way', 'at_warehouse', 'delivered', 'delayed'], true)) {
-    $kluda = "Izvēlēts nederīgs konteinera statuss!";
-	} else {
+    $data = getContainerData($_POST);
+    $kluda = validateContainer($data);
+
+    if ($kluda === '') {
         try {
-            $sql = "INSERT INTO containers
-                    (cargo_code, mineral, mass_kg, origin, destination, status)
-                    VALUES (:cargo_code, :mineral, :mass_kg, :origin, :destination, :status)";
-			
-			// SQL vaicājuma sagatavošana
-            $stmt = $pdo->prepare($sql);
-			
-			// Datu ievietošana un vaicājuma izpilde
-            $stmt->execute([
-                ":cargo_code" => $cargo_code,
-                ":mineral" => $mineral,
-				":mass_kg" => $mass_kg,
-				":origin" => $origin,
-				":destination" => $destination,
-				":status" => $status
-            ]);
-
-            // Pāradresācija novērš atkārtotu datu ievietošanu, atsvaidzinot lapu
-            header("Location: add-container.php?saglabats=1");
+            saveContainer($pdo, $data);
+            header('Location: add-container.php?saglabats=1');
             exit;
-
         } catch (PDOException $e) {
             error_log($e->getMessage());
-            $kluda = "Datus neizdevās saglabāt.";
+            $kluda = 'Datus neizdevās saglabāt.';
         }
     }
 }

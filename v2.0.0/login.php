@@ -7,6 +7,7 @@
  * Kļūdu paziņojumi tiek glabāti sesijā līdz nākamajam pieprasījumam.
  */
 require_once __DIR__ . '/auth.php';
+require_once __DIR__ . '/database.php';
 noCache();
 /**
  * Novirza jau autentificētu lietotāju uz administratora vai lietotāja lapu.
@@ -37,8 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
          * un CSRF tokenu, pēc tam novirza lietotāju pēc lomas.
          */
         try {
-            $pdo = new PDO('mysql:host=localhost;dbname=solar_cargo;charset=utf8mb4', 'root', '',
-                [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
+            $pdo = getDatabaseConnection();
             $stmt = $pdo->prepare('SELECT id, lietotajvards, parole_hash, loma FROM lietotaji WHERE lietotajvards = :v LIMIT 1');
             $stmt->execute([':v' => $username]);
             $user = $stmt->fetch(PDO::FETCH_ASSOC);

@@ -8,6 +8,7 @@
  */
 /** Ielādē kopīgās sesijas, drošības un pāradresācijas funkcijas. */
 require_once __DIR__ . '/auth.php';
+require_once __DIR__ . '/database.php';
 noCache();
 /** Nolasa un pēc tam notīra iepriekšējā pieprasījuma paziņojumus. */
 $kluda = $_SESSION['register_error'] ?? '';
@@ -29,8 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         /** Izveido lietotāju ar noklusēto 'user' lomu un droši jauktu paroli. */
         try {
-            $pdo = new PDO('mysql:host=localhost;dbname=solar_cargo;charset=utf8mb4', 'root', '',
-                [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
+            $pdo = getDatabaseConnection();
             // Lomu nekad nesaņemam no formas. Reģistrācijai vienmēr piešķiram user.
             $stmt = $pdo->prepare('INSERT INTO lietotaji (lietotajvards, parole_hash, loma) VALUES (:v, :p, :l)');
             $stmt->execute([':v'=>$username, ':p'=>password_hash($password, PASSWORD_DEFAULT), ':l'=>'user']);

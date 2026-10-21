@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/auth.php';
+require_once __DIR__ . '/database.php';
 noCache();
 
 if (!isset($_SESSION['lietotaja_id'])) {
@@ -13,11 +14,7 @@ if (!in_array($_SESSION['loma'] ?? '', ['user', 'admin'], true)) {
 
 // Savienojums ar datubāzi
 try {
-    $pdo = new PDO(
-        "mysql:host=localhost;dbname=solar_cargo;charset=utf8mb4",
-        "root",
-        ""
-    );
+    $pdo = getDatabaseConnection();
 
     $pdo->setAttribute(
         PDO::ATTR_ERRMODE,

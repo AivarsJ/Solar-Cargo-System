@@ -18,53 +18,13 @@ if (isset($_SESSION['lietotaja_id'])) {
 /** @var string $kluda Iepriekšējā pieslēgšanās mēģinājuma kļūdas paziņojums. */
 $kluda = $_SESSION['login_error'] ?? '';
 unset($_SESSION['login_error']);
-/**
- * Apstrādā POST pieprasījumu: validē CSRF un ievades datus,
- * pārbauda paroles atbilstību un izveido autentificētu sesiju.
- */
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!csrfValid()) {
-        $_SESSION['login_error'] = 'Forma ir novecojusi. Lūdzu, mēģiniet vēlreiz.';
-        redirect('login.php');
-    }
-    $username = trim((string)($_POST['fusername'] ?? ''));
-    $password = (string)($_POST['fpassword'] ?? '');
-    if ($username === '' || $password === '') {
-        $_SESSION['login_error'] = 'Aizpildiet abus laukus.';
-    } else {
-        /**
-         * Iegūst lietotāja ierakstu ar sagatavotu SQL vaicājumu un pārbauda paroli.
-         * Veiksmīgas autentifikācijas gadījumā atjauno sesijas identifikatoru
-         * un CSRF tokenu, pēc tam novirza lietotāju pēc lomas.
-         */
-        try {
-            $pdo = getDatabaseConnection();
-            $stmt = $pdo->prepare('SELECT id, lietotajvards, parole_hash, loma FROM lietotaji WHERE lietotajvards = :v LIMIT 1');
-            $stmt->execute([':v' => $username]);
-            $user = $stmt->fetch(PDO::FETCH_ASSOC);
-            if ($user && password_verify($password, $user['parole_hash']) && in_array($user['loma'], ['admin','user'], true)) {
-                session_regenerate_id(true);
-                $_SESSION['lietotaja_id'] = (int)$user['id'];
-                $_SESSION['lietotajvards'] = $user['lietotajvards'];
-                $_SESSION['loma'] = $user['loma'];
-                $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-                redirect($user['loma'] === 'admin' ? 'admin.php' : 'user.php');
-            }
-            $_SESSION['login_error'] = 'Nepareizs lietotājvārds vai parole.';
-        } catch (PDOException $ex) {
-            error_log($ex->getMessage());
-            $_SESSION['login_error'] = 'Pieslēgšanās šobrīd nav pieejama.';
-        }
-    }
-    // POST/Redirect/GET: pārlūka vēsturē neatstājam POST formas rezultātu.
-    redirect('login.php');
-}
+
 ?>
 <!DOCTYPE html><html lang="lv"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Pieslēgšanās — Solar Cargo System</title><link rel="stylesheet" href="style.css"></head><body>
 <main class="site-container"><h1>Solar Cargo System</h1><h2>Pieslēgšanās sistēmai</h2>
 <?php if ($kluda !== ''): ?><p class="error" role="alert"><?= e($kluda) ?></p><?php endif; ?>
-<form action="login.php" method="post" autocomplete="off">
+<form action="login_handler.php" method="post" autocomplete="off">
 <input type="hidden" name="csrf_token" value="<?= e(csrfToken()) ?>">
 <label for="fusername">Lietotājvārds:</label><input type="text" id="fusername" name="fusername" maxlength="100" autocomplete="off" required value="">
 <label for="fpassword">Parole:</label><input type="password" id="fpassword" name="fpassword" autocomplete="off" required value="">

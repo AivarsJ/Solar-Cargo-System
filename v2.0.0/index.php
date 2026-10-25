@@ -10,22 +10,31 @@
 <main class="site-container">
     <h1>Solar Cargo System</h1>
     <p>Kosmisko konteineru uzskaites sistēma.</p>
+	<p>Sistēma ir paredzēta kosmisko pārvadājumu plānošanai, organizēšanai, 
+	piegāžu kontroles nodrošināšanai un pārvadājumu biznesa informācijas apstrādei.</p>
 
     <h2>Sistēmas lietotāji</h2>
     <ul class="roles-list">
-        <li>Dispečers</li>
-        <li>Noliktavas operators</li>
-        <li>Vadītājs</li>
-		<li>Sistēmas administrators</li>
+        <li><strong>Dispečers</strong>
+			<p>Koordinē konteineru kustību. Darba pienākumu izpildei nepieciešama piekļuve konteineru sarakstam.</p>
+			<p>Tiesības: datu atlase un apskate.</p>
+		</li>
+        <li><strong>Noliktavas operators</strong>
+			<p>Nodrošina kravu uzskaiti. Darba pienākumu izpildei nepieciešama piekļuve konteineru sarakstam un jaunu konteineru pievienošanas formai.</p>
+			<p>Tiesības: datu atlase, apskate un apstrāde, piegādes statusu nomaiņa.</p></li>
+        <li><strong>Vadītājs</strong>
+			<p>Pārvadājumu vadība. Darba pienākumu izpildei nepieciešama piekļuve konteineru sarakstam un jaunu konteineru pievienošanas formai.</p>
+			<p>Tiesības: datu atlase, analīze, piegādes statusu maiņa, ierakstu arhivēšana vai dzēšana.</p></li>
+		<li><strong>Sistēmas administrators.</strong>
+			<p>Tiesības: sistēmas uzturēšana.</p></li>
     </ul>
 
     <h2>Navigācija</h2>
     <nav class="navigation" aria-label="Galvenā navigācija">
-        <a href="containers_list.php">Apskatīt konteineru sarakstu</a>
-        <a href="add-container.php">Pievienot jaunu konteineru</a>
+        <a href="about.php">Par mums</a>
+        <a href="contacts.php">Kontakti</a>
         <a href="db.php">Reģistrēties</a>
         <a href="login.php">Pieslēgties</a>
-        <a href="logout.php">Izrakstīties</a>
     </nav>
 </main>
 </body>

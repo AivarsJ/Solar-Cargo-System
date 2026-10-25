@@ -1,6 +1,6 @@
 # Solar Cargo System
 
-**Solar Cargo System** ir mācību tīmekļa lietotne kosmisko kravu konteineru uzskaitei. Tā veidota ar PHP, HTML, CSS un MySQL/MariaDB.
+**Solar Cargo System** ir mācību tīmekļa lietotne, kosmisko kravu konteineru uzskaitei. Tā veidota ar PHP, HTML, CSS un MySQL/MariaDB.
 
 ## 1. Projekta mērķis
 
@@ -90,7 +90,7 @@ Pieļaujamie konteineru statusi: `on_way` (Ceļā), `at_warehouse` (Noliktavā),
 
 ## 4. Failu struktūra un uzdevumi
 
-Paredzētā struktūra pēc failu nosaukumu normalizēšanas:
+Arhīvā `v2.0.0.zip` pārbaudītā failu struktūra:
 
 ```text
 solar_cargo/
@@ -120,7 +120,42 @@ Konteineru apskate un pievienošana paredzēta abām lomām. Reģistrācijas for
 - **Funkciju sadalīšana:** konteineru apstrādē izmantotas `getContainerData()`, `validateContainer()` un `saveContainer()`.
 - **Atbildību nodalīšana:** reģistrācijas, pieslēgšanās un konteineru pievienošanas formas nodalītas no attiecīgajiem POST apstrādātājiem.
 
-## 5. Zināmie ierobežojumi
+
+## 5. Sākumlapas izmaiņas un regresijas pārbaude
+
+**Veiktās izmaiņas sākumlapā:**
+
+- Papildināts Solar Cargo System mērķa un kosmisko pārvadājumu uzdevumu apraksts.
+- Pievienots sistēmas lietotāju darbības apraksts: dispečers, noliktavas operators, vadītājs un administrators. 
+  Tās ir **plānotās darbības lomas**, nevis atsevišķi ieviestas autentifikācijas līmeņi; pašlaik darbojas tikai `user` un `admin`.
+- Publiskajā sākumlapā noņemtas saites uz konteineru sarakstu un pievienošanu: šīs darbības pieejamas pēc pieslēgšanās lietotāja vai administratora lapā.
+- Sākumlapas navigācijā ir `Par mums` (`about.php`), `Kontakti` (`contacts.php`), `Reģistrēties` (`db.php`) un `Pieslēgties` (`login.php`). 
+  Pirmās divas lapas v2.0.0 arhīvā **nav izveidotas**; saites šobrīd noved pie HTTP 404 kļūdas.
+- Sākumlapā nav pogas `Izrakstīties`; izrakstīšanās pieejama autentificēta lietotāja un administratora lapā.
+
+**Atskaitē dokumentētā manuālā regresijas pārbaude (PB4_PD07):**
+
+1. Pārbaudīts sākumlapas sistēmas apraksts; atbilstība specifikācijai ir daļēja, jāuzlabo izkārtojums.
+2. Pārbaudīts lietotāju funkciju apraksts; teksts redzams, nepieciešami CSS uzlabojumi.
+3. Pārbaudītas saites `Par mums` un `Kontakti`; abas pašlaik atgriež `Not Found` (zināms ierobežojums, nevis pabeigta funkcionalitāte).
+4. Pārbaudīts, ka sākumlapā nav `Izrakstīties` pogas.
+5. Pēc pieslēgšanās ar `user` un `admin` kontiem ir pieejams konteineru saraksts un pievienošanas forma.
+6. Pārbaudīta izrakstīšanās; lietotājs tiek novirzīts uz sākumlapu.
+
+**Papildu statiskā pārbaude v2.0.0 arhīvam (2026-10-25):** visiem 13 PHP failiem izpildīta `php -l` sintakses pārbaude bez kļūdām. Pārskatīti formu `action`, CSRF pārbaudes, 
+autentifikācijas nosacījumi, datubāzes savienojuma izsaukumi un konteineru saglabāšanas ceļš. `container_handler.php` saglabāšanas ceļā ir `getDatabaseConnection()` 
+un `saveContainer()`; iepriekšējā priekšlaicīgā pāradresācija v2.0.0 nav konstatēta. **Nav veikta automatizēta vai datubāzē izpildīta pilna end-to-end pārbaude**, 
+tāpēc pilnīgu regresiju neesamību apstiprināt nevar.
+
+**Atlikušie darbi (pašlaik atlikti):**
+
+- Izveidot `about.php` un `contacts.php` vai līdz tam navigācijā skaidri norādīt, ka sadaļas ir izstrādē.
+- Saskaņot sākumlapā aprakstītās lietotāju tiesības ar faktiski ieviestajām funkcijām: statusu maiņa, ierakstu dzēšana un arhivēšana vēl nav realizēta.
+- `add-container.php`: forma veido PDO savienojumu, lai gan datubāzi izmanto `container_handler.php`; nevajadzīgo pieslēgumu var izņemt pēc pārbaudes.
+- `login.php` un `db.php`: atjaunot failu sākuma komentārus, jo POST apstrāde ir pārvietota uz `login_handler.php` un `register_handler.php`.
+- Izveidot `schema.sql` un automatizētus regresijas testus, īpaši reģistrācijai, pieslēgšanās/izrakstīšanās procesam, CSRF, lomu piekļuvei, konteineru validācijai un saglabāšanai.
+
+## 6. Zināmie ierobežojumi
 
 1. **Nepilnīga administratora funkcionalitāte.** Lietotāju pārvaldība un sistēmas iestatījumi administratora panelī ir vēl neizveidoti.
 2. **Lomu atšķirība.** Sākumlapā aprakstītās dispečera, noliktavas operatora un vadītāja lomas nav ieviestas kā atsevišķas autentifikācijas lomas; 
@@ -130,10 +165,10 @@ Konteineru apskate un pievienošana paredzēta abām lomām. Reģistrācijas for
 5. **Nav dokumentēta automatizēta testēšana.** Nav izveidota automatizētu testu konfigurācija vai testu kopa.
 6. **Nav apstiprināta produkcijas gatavība.** Nav iesniegti produkcijas izvietošanas, rezerves kopiju, monitoringa un pilna drošības audita rezultāti.
 
-## 6. Publicēšanas informācija
+## 7. Publicēšanas informācija
 
-**Pašreizējais statuss:** mācību projekts; iesniegtie materiāli dokumentē lokālu palaišanu. 
-Publiskas izvietošanas adrese, repozitorija URL, versijas numurs un licence nav norādīti.
+**Pašreizējais statuss:** mācību projekts (v2.0.0); iesniegtie materiāli dokumentē lokālu palaišanu. 
+Publiskas izvietošanas adrese, repozitorija URL un licence nav norādīti. Arhīva versija: `v2.0.0`.
 
 ### Lokāla demonstrācija
 

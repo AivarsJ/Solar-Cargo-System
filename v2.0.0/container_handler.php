@@ -90,7 +90,12 @@ try {
 
 } catch (PDOException $e) {
     error_log($e->getMessage());
-    $_SESSION['container_error'] = 'Datus neizdevās saglabāt.';
+	if (($e->errorInfo[1]?? null) === 1062){
+		$_SESSION['container_error'] = 'Šis kravas kods jau eksistē. Pārbaudiet kodu.';
+	}
+	else {
+		$_SESSION['container_error'] = 'Datus neizdevās saglabāt.';
+	}
     redirect('add-container.php');
 }
 }

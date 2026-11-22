@@ -1,6 +1,12 @@
 # Projekta Solar Cargo Systems Change Log
 
 2026-11-22
+Handle duplicate cargo_code errors during container registration.
+
+2026-11-22
+Handle duplicate username errors during registration.
+
+2026-11-22
 Created and added solar_cargo_schema.sql. ALTER existing database solar_cargo on localhost.
 
 2026-10-25

@@ -1,5 +1,8 @@
 # Projekta Solar Cargo Systems Change Log
 
+2026-11-22
+Created and added solar_cargo_schema.sql. ALTER existing database solar_cargo on localhost.
+
 2026-10-25
 Veikta sistēmas galvenās lapas aprakstu un darbības loģikas uzlabošana. Noņemtas konteineru apskates pievienošanas funkcijas, noņemta poga 'Izrakstīties'. 
 Papildināts ar pogām 'Par mums' un 'Kontakti'.

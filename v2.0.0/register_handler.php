@@ -24,8 +24,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->execute([':v'=>$username, ':p'=>password_hash($password, PASSWORD_DEFAULT), ':l'=>'user']);
             $_SESSION['register_success'] = 'Reģistrācija veiksmīga. Tagad varat pieslēgties.';
         } catch (PDOException $ex) {
-            error_log($ex->getMessage());
-            $_SESSION['register_error'] = 'Reģistrācija neizdevās. Pārbaudiet datus vai mēģiniet citu lietotājvārdu.';
+			error_log($ex->getMessage());
+            if (($ex->errorInfo[1]?? null) === 1062){
+				$_SESSION['register_error'] = 'Reģistrācija neizdevās. Šāds lietotājvārds jau eksistē.';
+			}
+			else{
+				$_SESSION['register_error'] = 'Reģistrācija neizdevās. Pārbaudiet datus vai mēģiniet citu lietotājvārdu.';
+			}
         }
     }
     redirect('db.php');

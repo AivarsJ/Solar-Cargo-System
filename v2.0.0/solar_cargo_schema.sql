@@ -1,0 +1,27 @@
+CREATE DATABASE solar_cargo
+CHARACTER SET utf8mb4
+COLLATE utf8mb4_unicode_ci;
+USE solar_cargo;
+
+CREATE TABLE IF NOT EXISTS containers (
+ id INT AUTO_INCREMENT PRIMARY KEY,
+ cargo_code VARCHAR(30) NOT NULL UNIQUE,
+ mineral VARCHAR(100) NOT NULL,
+ mass_kg DECIMAL(10,2) NOT NULL,
+ origin VARCHAR(100) NOT NULL,
+ destination VARCHAR(100) NOT NULL,
+ status VARCHAR(50) NOT NULL,
+ created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
+
+CREATE TABLE IF NOT EXISTS lietotaji (
+	id INT AUTO_INCREMENT PRIMARY KEY,
+	lietotajvards VARCHAR (100) NOT NULL UNIQUE,
+	parole_hash VARCHAR (255) NOT NULL,
+	loma ENUM ('admin', 'user') NOT NULL DEFAULT 'user'
+);
+
+
+-- SHOW TABLES;

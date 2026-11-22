@@ -1,8 +1,8 @@
 # Projekta Solar Cargo Systems Change Log
 
 2026-10-25
-Veikta sistēmas galvenās lapas aprakstu un darbības loģikas uzlabošana. Noņemtas konteineru apskates pievienošanas funkcijas, noņemta poga "Izrakstīties".
-Papildināts ar pogām "Par mums" un "Kontakti".
+Veikta sistēmas galvenās lapas aprakstu un darbības loģikas uzlabošana. Noņemtas konteineru apskates pievienošanas funkcijas, noņemta poga 'Izrakstīties'. 
+Papildināts ar pogām 'Par mums' un 'Kontakti'.
 
 2026-10-22
 Dokumentēta veiktā refaktorēšana

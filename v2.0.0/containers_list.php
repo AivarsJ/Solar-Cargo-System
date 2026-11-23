@@ -45,6 +45,10 @@ $ieraksti = $stmt->fetchAll(PDO::FETCH_ASSOC);
 	<link rel="stylesheet" href="style.css">
 </head>
 <body>
+	<nav class="navigation">
+		<a href="user.php">Lietotāja lapa</a>
+	</nav>
+	
     <h1>Konteineru saraksts</h1>
 
 <table>

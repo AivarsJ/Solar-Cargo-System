@@ -1,5 +1,17 @@
 # Projekta Solar Cargo Systems Change Log
 
+2026-11-23
+Handle contacts.php.
+
+2026-11-23
+Added button "Lietotāja lapa" to 'containers_list.php'.
+
+2026-11-23
+Added button "Lietotāja lapa" to add_container.php.
+
+2026-11-23
+Handle about.php.
+
 2026-11-22
 Handle duplicate cargo_code errors during container registration.
 

@@ -36,6 +36,10 @@ unset($_SESSION['container_error']);
 </head>
 
 <body>
+	<nav class="navigation">
+		<a href="user.php">Lietotāja lapa</a>
+	</nav>
+	
     <h1>Pievienot jaunu konteineri</h1>
 
 <?php if (isset($_GET["saglabats"])
@@ -72,7 +76,7 @@ unset($_SESSION['container_error']);
     max="99999999.99"
     step="0.01"
     required
-><br>
+  ><br>
   
   <label for="forigin">Izcelsmes bāze:</label><br>
   <input type="text" id="forigin" name="forigin" value=""><br>

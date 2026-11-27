@@ -1,4 +1,10 @@
-# Projekta Solar Cargo Systems Change Log
+# Projekta Solar Cargo System Change Log
+
+2026-11-27
+Update README to reflect implemented features and current project status
+
+2026-11-27
+Implement container filtering by cargo code and status.
 
 2026-11-23
 Handle contacts.php.

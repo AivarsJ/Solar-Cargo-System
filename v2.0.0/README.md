@@ -149,7 +149,7 @@ tāpēc pilnīgu regresiju neesamību apstiprināt nevar.
 
 **Atlikušie darbi (pašlaik atlikti):**
 
-- Izveidot `about.php` un `contacts.php` vai līdz tam navigācijā skaidri norādīt, ka sadaļas ir izstrādē.
+- Izveidot `about.php` un `contacts.php` vai līdz tam navigācijā skaidri norādīt, ka sadaļas ir izstrādē. * IZPILDĪTS
 - Saskaņot sākumlapā aprakstītās lietotāju tiesības ar faktiski ieviestajām funkcijām: statusu maiņa, ierakstu dzēšana un arhivēšana vēl nav realizēta.
 - `add-container.php`: forma veido PDO savienojumu, lai gan datubāzi izmanto `container_handler.php`; nevajadzīgo pieslēgumu var izņemt pēc pārbaudes.
 - `login.php` un `db.php`: atjaunot failu sākuma komentārus, jo POST apstrāde ir pārvietota uz `login_handler.php` un `register_handler.php`.

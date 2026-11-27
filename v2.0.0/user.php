@@ -59,11 +59,14 @@ $lietotajvards = e((string)($_SESSION['lietotajvards'] ?? ''));
     <p>Kosmisko konteineru uzskaites sistēma.</p>
     <!-- Navigācija uz konteineru lapām, sākumlapu un izrakstīšanos. -->
     <nav class="navigation" aria-label="Lietotāja navigācija">
-        <a href="containers_list.php">Apskatīt konteineru sarakstu</a>
+        <a href="containers_list.php?mode=all">Apskatīt konteineru sarakstu</a>
+		<a href="containers_list.php?mode=search">Atlasīt konteinerus</a>
         <a href="add-container.php">Pievienot jaunu konteineru</a>
         <a href="index.php">Galvenā lapa</a>
         <!-- logout.php izbeidz sesiju un atgriež lietotāju sākumlapā. -->
-        <form class="logout-inline" action="logout.php" method="post"><input type="hidden" name="csrf_token" value="<?= e(csrfToken()) ?>"><button type="submit">Izrakstīties</button></form>
+        <form class="logout-inline" action="logout.php" method="post">
+		<input type="hidden" name="csrf_token" value="<?= e(csrfToken()) ?>">
+		<button type="submit">Izrakstīties</button></form>
     </nav>
 </main>
 <script>window.addEventListener('pageshow', function(event) { if (event.persisted) window.location.reload(); });</script></body>
